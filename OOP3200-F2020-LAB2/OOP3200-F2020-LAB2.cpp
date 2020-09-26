@@ -18,8 +18,9 @@
 using namespace std;
 
 class WorkTicket {
-	//Attributes
+	
 private:
+	//Attributes
 	//private data members
 	int workTicketNumber;
 	string clientID;
@@ -29,8 +30,8 @@ private:
 	string issueDescription;
 
 public:
+	
 	//Mutators
-	//Declarations
 	void SetWorkTicketNumber(int workTicektNumber);
 	void SetClientID(string clientID);
 	void SetWorkTicketDateDay(int day);
@@ -39,21 +40,34 @@ public:
 	void SetIssueDescription(string description);
 	bool SetWorkTicket(int workTicketNumber, string clientID, int workTicketDateDay, int workTicketDateMonth,
 	int workTicketDateYear, string issueDescription);
-	WorkTicket(const WorkTicket& ticket2);
+	//
+	
+	
+	//Friend overload
+	friend std::ostream& operator << (std::ostream& out, const WorkTicket& ticket);
+	friend std::istream& operator >>(std::istream& in, WorkTicket& point);
+
+	//Comaprison
+	bool operator==(const WorkTicket& other_ticket) const;
+	
 	//Accessors
-	//Declaration
-	int GetWorkTicketNumber();
-	string GetClientID();
-	int GetWorkTicketDateDay();
-	int GetWorkTicketDateMonth();
-	int GetWorkTicketDateYear();
-	string getIssueDescription();
+	int GetWorkTicketNumber() const;
+	string GetClientID() const;
+	int GetWorkTicketDateDay() const;
+	int GetWorkTicketDateMonth() const;
+	int GetWorkTicketDateYear() const;
+	WorkTicket GetWorkTicket() const;
+	string GetIssueDescription() const;
 	string ShowWorkTicket() const;
+	
 	//Constructors
 	//Default
 	WorkTicket();
 	//Parameterized Constructor
 	WorkTicket(int workTicketNumber, string clientID, int workTicketDateDay, int workTicketDateMonth, int workTicketDateYear, string issueDescription);
+	
+	//Copy constructor
+	WorkTicket(const WorkTicket& ticket2);
 };
 //Main
 int main()
@@ -66,14 +80,17 @@ int main()
 	string inputClientID;
 	string inputClientIssue;
 
+	bool isValid;
+
 	//Constants
 	const int NUM_TICKETS = 3; // total tickets being made
 
 	//Objects
-	WorkTicket ticket[NUM_TICKETS];
-	WorkTicket ticket2 = WorkTicket();
+	WorkTicket ticket[NUM_TICKETS];//users workticket arr
+	WorkTicket default_ticket = WorkTicket();//default workticket
+	
 	cout << "Default ticket example :" << endl;
-	cout << ticket2.ShowWorkTicket() << endl;
+	cout << default_ticket << endl;
 	cout << "===================================================\n";
 
 	cout << "You will be making " << NUM_TICKETS << " tickets today..." << endl;
@@ -88,22 +105,27 @@ int main()
 			cout << "\nProcessing Ticket #" << i + 1 << endl;
 			cout << "\nEnter your ticket number (Whole, positive number):";
 			inputTicketNumber = ConsoleInput::ReadInteger(1);
-			cout << "Enter your ticket ID (alpha-numeric):";
+			
+			cout << "\nEnter your ticket ID (alpha-numeric):";
 			cin.ignore();
 			getline(cin >> std::ws, inputClientID);
+			
 			cout << "\nEnter the day the ticket was opened:(min.1 max.31)";
 			inputDay = ConsoleInput::ReadInteger(1, 31);
+			
 			cout << "\nEnter the month the ticket was opened:(min.1 max.12)";
 			inputMonth = ConsoleInput::ReadInteger(1, 12);
+			
 			cout << "\nEnter the year the ticket was opened:(min.2000 max.2099)";
 			inputYear = ConsoleInput::ReadInteger(2000, 2099);
+			
 			cout << "\nEnter your work issue description:";
 			cin.ignore();
 			getline(cin >> std::ws, inputClientIssue);
 
 			//once ticket has all valid inputs, place into object array
-
-			if (ticket[i].SetWorkTicket(inputTicketNumber, inputClientID, inputDay, inputMonth, inputYear, inputClientIssue) == true)
+			isValid = true;
+			if (ticket[i].SetWorkTicket(inputTicketNumber, inputClientID, inputDay, inputMonth, inputYear, inputClientIssue) == isValid)
 			{
 				//Ticket confirmation
 				cout << "Ticket #" << i + 1 << " processed." << endl;
@@ -117,35 +139,29 @@ int main()
 		for (int i = 0; i < NUM_TICKETS; i++)
 		{
 			cout << "TICKET ENTRY:" << i + 1 << endl;
-			cout << ticket[i].ShowWorkTicket() << endl;
+			cout << ticket[i] << endl;
 		}
 	}
-	
 	
 	//Will catch any invalid inputs and give an error
 	catch (exception& ex)
 	{
+		isValid = false;
 		cerr << ex.what() << "Ending the program." << endl;
 	}
 	
+	//copy Q.1 and display with ostream Q.6
 	WorkTicket ticket3 = ticket[0];
-	cout << ticket3.ShowWorkTicket();
+	cout << ticket3;
+	//Equality operator Q.3
+	cout << "ticket 1 and 2 equal?" << to_string(ticket[0] == ticket[1]) << endl;
 }
-
+//Copy ticket definition Q.1
 WorkTicket::WorkTicket(const WorkTicket& ticket2)
 {
-	//SetWorkTicket(workTicketNumber, clientID, workTicketDateDay, workTicketDateMonth, workTicketDateYear, issueDescription);
-	workTicketDateDay = ticket2.workTicketDateDay;
-	workTicketDateMonth = ticket2.workTicketDateMonth;
-	workTicketDateYear = ticket2.workTicketDateYear;
-	workTicketNumber = ticket2.workTicketNumber;
-	clientID = ticket2.clientID;
-	issueDescription = ticket2.issueDescription;
-
+	SetWorkTicket(ticket2.workTicketNumber, ticket2.clientID, ticket2.workTicketDateDay, ticket2.workTicketDateMonth, ticket2.workTicketDateYear, ticket2.issueDescription);
 	cout << "\nA WorkTicket object was COPIED.\n";
-	
 }
-
 
 //Class Definition Section
 //Default Constructor definition
@@ -160,55 +176,19 @@ WorkTicket::WorkTicket() {
 //Parametized contructor definition
 WorkTicket::WorkTicket(int workTicketNumber, string clientID, int workTicketDateDay, int workTicketDateMonth, int workTicketDateYear,
 	string issueDescription) {
-	SetWorkTicket(workTicketNumber, clientID, workTicketDateDay, workTicketDateMonth,
-		workTicketDateYear, issueDescription);
+	SetWorkTicket(workTicketNumber, clientID, workTicketDateDay, workTicketDateMonth,workTicketDateYear, issueDescription);
 }
 //Set work ticket boolean for validation and storing user input definition 
-bool WorkTicket::SetWorkTicket(int workTicketNumber, string clientID, int workTicketDateDay, int workTicketDateMonth,
-	int workTicketDateYear, string issueDescription) {
-	if (workTicketNumber >= 1) {
-		SetWorkTicketNumber(workTicketNumber);
-		if (clientID.size() >= 1) {
-			SetClientID(clientID);
-			if (workTicketDateDay >= 1 && workTicketDateDay <= 31) {
-				SetWorkTicketDateDay(workTicketDateDay);
-				if (workTicketDateMonth >= 1 && workTicketDateMonth <= 12) {
-					SetWorkTicketDateMonth(workTicketDateMonth);
-					if (workTicketDateYear >= 2000 && workTicketDateYear <= 2099) {
-						SetWorkTicketDateYear(workTicketDateYear);
-						if (issueDescription.size() >= 1) {
-							SetIssueDescription(issueDescription);
-							return true;
-						}
-						else {
-							cout << "\nInvalid issue description";
-							return false;
-						}
-					}
-					else {
-						cout << "\nERROR, Year is out of range, must be between 2000 and 2099";
-						return false;
-					}
-				}
-				else {
-					cout << "\nERROR, Month is out of range, must be between 1 and 12";
-					return false;
-				}
-			}
-			else {
-				cout << "\nERROR, Day is out of range, must be between 1 and 31";
-				return false;
-			}
-		}
-		else {
-			cout << "\nInvalid clientID";
-			return false;
-		}
-	}
-	else {
-		cout << " \nInvalid ticket number. Ticket number must be a whole, positive number";
-		return false;
-	}
+bool WorkTicket::SetWorkTicket(int workTicketNumber, string clientID, int workTicketDateDay, int workTicketDateMonth, int workTicketDateYear, string issueDescription)
+{
+	SetWorkTicketNumber(workTicketNumber);
+	SetClientID(clientID);
+	SetWorkTicketDateDay(workTicketDateDay);
+	SetWorkTicketDateMonth(workTicketDateMonth);
+	SetWorkTicketDateYear(workTicketDateYear);
+	SetIssueDescription(issueDescription);
+	return true;
+	
 }
 //Mutators definitions
 void WorkTicket::SetWorkTicketNumber(int ticketNumber) {
@@ -229,26 +209,38 @@ void WorkTicket::SetWorkTicketDateMonth(int month) {
 void WorkTicket::SetWorkTicketDateYear(int year) {
 	this->workTicketDateYear = year;
 }
+//Equality operator will return true if ticket equal to other ticket, false otherwise. Q.3
+bool WorkTicket::operator==(const WorkTicket& other_ticket) const
+{
+	return ((GetWorkTicketDateDay() == other_ticket.GetWorkTicketDateDay()) && GetWorkTicketDateMonth() == other_ticket.GetWorkTicketDateMonth() && GetWorkTicketDateYear() == other_ticket.GetWorkTicketDateYear()
+				&& GetWorkTicketNumber() == other_ticket.GetWorkTicketNumber() && GetIssueDescription() == other_ticket.GetIssueDescription() && GetClientID() == other_ticket.GetClientID());
+	//
+	// return (GetWorkTicket() == other_ticket.GetWorkTicket());
+}
 //Accessors definitions
-int WorkTicket::GetWorkTicketNumber() {
+int WorkTicket::GetWorkTicketNumber() const{
 	return this->workTicketNumber;
 }
-string WorkTicket::GetClientID() {
+string WorkTicket::GetClientID() const{
 	return this->clientID;
 }
-string WorkTicket::getIssueDescription() {
+string WorkTicket::GetIssueDescription() const{
 	return this->issueDescription;
 }
-int WorkTicket::GetWorkTicketDateDay() {
+int WorkTicket::GetWorkTicketDateDay() const{
 	return this->workTicketDateDay;
 }
-int WorkTicket::GetWorkTicketDateMonth() {
+int WorkTicket::GetWorkTicketDateMonth() const{
 	return this->workTicketDateMonth;
 }
-int WorkTicket::GetWorkTicketDateYear() {
+int WorkTicket::GetWorkTicketDateYear() const{
 	return this->workTicketDateYear;
 }
-//Output to show the object attributes 
+//Trying to return all attributes from WorkTicket to use for operator ==
+WorkTicket WorkTicket::GetWorkTicket() const
+{
+	return WorkTicket();
+}
 string WorkTicket::ShowWorkTicket() const {
 	// declare a stringstream object
 	stringstream strOut;
@@ -258,4 +250,9 @@ string WorkTicket::ShowWorkTicket() const {
 		"\nIssue Description : " << issueDescription << "\n";
 	return strOut.str();
 }
-
+//Output stream definition Q.6
+std::ostream& operator<<(std::ostream& out, const WorkTicket& ticket)
+{
+	out << ticket.ShowWorkTicket();
+	return out;
+}

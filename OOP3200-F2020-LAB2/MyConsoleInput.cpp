@@ -12,13 +12,11 @@ using namespace std;
 	// ReadDouble function definition
 	double ConsoleInput::ReadDouble(const double MIN, const double MAX)
 	{
-
 		double validNumber = 0.0; // holds the user input
 
 		cin >> validNumber;       // try to get input
 
 		// remove any remaining characters from the buffer.
-		
 
 		if (cin.fail())            // if user input fails...
 		{
